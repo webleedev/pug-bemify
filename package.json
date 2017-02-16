@@ -1,0 +1,32 @@
+{
+  "name": "pug-bemify",
+  "version": "1.0.0",
+  "description": "Adds bem shortcuts to pug",
+  "main": "index.js",
+  "scripts": {
+    "test": "node bin/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/khalidhoffman/pug-bemify.git"
+  },
+  "keywords": [
+    "pugjs",
+    "pug",
+    "BEM",
+    "bem-methodology",
+    "pug-lexer",
+    "plugin"
+  ],
+  "author": "Khalid Hoffman",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/khalidhoffman/pug-bemify/issues"
+  },
+  "homepage": "https://github.com/khalidhoffman/pug-bemify#readme",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0",
+    "pug": "^2.0.0-beta10"
+  }
+}
