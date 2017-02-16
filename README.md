@@ -17,7 +17,7 @@ pug.render(somePugString, {
 ```
 .block.-a-modifier
     ._some-element
-        span.a-grandchild__with-content Inside
+        span.a-grandchild.-with-content Inside
 ```
 renders:
 ```
