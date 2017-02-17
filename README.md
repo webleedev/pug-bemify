@@ -50,4 +50,4 @@ which renders:
   color: #f00;
 }
 ```
-hint: the `/` character is replaced with the parent block (in this case `.block`)
+hint: the `/` character in `/__` or `/--` is replaced with the parent block (in this case `.block`)
