@@ -9,7 +9,6 @@ PugLexBemifier.prototype = {
         var mostRecentBEMBlock = this.bemBlocks[this.bemBlocks.length - 1],
             prevToken = lexer.tokens[lexer.tokens.length - 1];
 
-        this.colno = token.lexerColNo || 0;
         this.tokens.push(token);
 
         if (this.stop){
@@ -40,10 +39,6 @@ PugLexBemifier.prototype = {
         }
     },
 
-    prepare: function(lexer, token){
-        token.lexerColNo = lexer.colno;
-    },
-
     reset: function(){
         this.tokens = [];
     }
@@ -52,12 +47,6 @@ PugLexBemifier.prototype = {
 module.exports = function () {
     var bemifier = new PugLexBemifier();
     return {
-        lex: function(){
-            var token = this.tokens[this.tokens.length - 1];
-            if (token){
-                bemifier.prepare(this, token);
-            }
-        },
         postLex: function (tokens) {
             bemifier.reset();
             tokens.forEach(function (token) {
