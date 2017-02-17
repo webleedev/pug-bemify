@@ -1,6 +1,6 @@
 {
   "name": "pug-bemify",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Adds bem shortcuts to pug",
   "main": "index.js",
   "scripts": {
