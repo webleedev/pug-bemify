@@ -1,58 +1,76 @@
-function PugLexBemifier() {
-    this.bemBlocks = this.bemBlocks || [];
-    this.tokens = this.tokens || [];
+function PugBEMAST(ast, options) {
+    this.ast = ast;
+    this.modifierRegExp = options && options.modifierRegExp || /^'--?/;
+    this.elementRegExp = options && options.elementRegExp || /^'__?/;
 }
 
-PugLexBemifier.prototype = {
+PugBEMAST.prototype = {
+    recursiveBemify: function (node, parent) {
+        var self = this;
+        var nodes = node && node.nodes || node && node.block && node.block.nodes || [];
+        var attrs = node && node.attrs || [];
+        var parentBEMParams = parent && parent.nodeBEMParams || {
+            classAttr: null,
+            isElementClassAttr: null,
+            isModifierClassAttr: null,
+            isBlock: null,
+            blockAttr: null
+        };
+        var nodeBEMParams = {
+            classAttr: null,
+            isElementClassAttr: null,
+            isModifierClassAttr: null,
+            isBlock: null,
+            blockAttr: null
+        };
 
-    bemify: function (lexer, token) {
-        var mostRecentBEMBlock = this.bemBlocks[this.bemBlocks.length - 1],
-            prevToken = lexer.tokens[lexer.tokens.length - 1];
+        attrs.forEach(function (nodeAttr, attrIndex) {
+            var isClassAttr = nodeAttr.name === 'class';
+            if (isClassAttr) {
+                nodeBEMParams.classAttr = nodeAttr;
+                nodeBEMParams.isElementClassAttr = self.elementRegExp.test(nodeAttr.val);
+                nodeBEMParams.isModifierClassAttr = self.modifierRegExp.test(nodeAttr.val);
+                nodeBEMParams.isBlock = !nodeBEMParams.isElementClassAttr && !nodeBEMParams.isModifierClassAttr;
 
-        this.tokens.push(token);
+                if ((!parentBEMParams.blockAttr || attrIndex === 0) && nodeBEMParams.isBlock) {
+                    parentBEMParams.blockAttr = nodeBEMParams.classAttr;
+                }
 
-        if (this.stop){
-            this.stop = false;
-        }
-        if (mostRecentBEMBlock && /divider/.test(mostRecentBEMBlock.val)){
-            this.stop = true;
-        }
-        if (prevToken){
-            switch(prevToken.type){
-                case 'outdent':
-                case 'newline':
-                    if (mostRecentBEMBlock  && token.col <= mostRecentBEMBlock.col) {
-                        this.bemBlocks.pop();
-                    }
-                    // update BEM state
-                    mostRecentBEMBlock = this.bemBlocks[this.bemBlocks.length - 1];
+                nodeBEMParams.blockAttr = parentBEMParams.blockAttr;
+
+                if (nodeBEMParams.isModifierClassAttr && nodeBEMParams.blockAttr) {
+                    var modifierClassPrefix = nodeBEMParams.blockAttr.val.replace(/'$/, '--');
+                    nodeBEMParams.classAttr.val = nodeBEMParams.classAttr.val.replace(self.modifierRegExp, modifierClassPrefix);
+                }
+
+                if (nodeBEMParams.isElementClassAttr && nodeBEMParams.blockAttr) {
+                    var elementClassPrefix = nodeBEMParams.blockAttr.val.replace(/'$/, '__');
+                    nodeBEMParams.classAttr.val = nodeBEMParams.classAttr.val.replace(self.elementRegExp, elementClassPrefix);
+                }
             }
-        }
-        if (token.type == 'class') {
-            if (token.val.match(/^[a-zA-Z]/) && !(prevToken && prevToken.type == 'class')) {
-                this.bemBlocks.push(token);
-            } else if (mostRecentBEMBlock && token.val.match(/^\-/)) {
-                token.val = token.val.replace(/^\-\-?/, mostRecentBEMBlock.val + '--');
-            } else if (mostRecentBEMBlock && token.val.match(/^\_/)) {
-                token.val = token.val.replace(/^\_\_?/, mostRecentBEMBlock.val + '__');
-            }
-        }
+        });
+
+
+        nodes.forEach(function (childNode) {
+            node.nodeBEMParams = nodeBEMParams;
+            self.recursiveBemify(childNode, node);
+            delete node.nodeBEMParams;
+        });
+
+        return node;
     },
 
-    reset: function(){
-        this.tokens = [];
+    toPugAST: function () {
+        return this.recursiveBemify(this.ast);
     }
 };
 
 module.exports = function () {
-    var bemifier = new PugLexBemifier();
     return {
-        postLex: function (tokens) {
-            bemifier.reset();
-            tokens.forEach(function (token) {
-                bemifier.bemify(bemifier, token);
-            });
-            return bemifier.tokens;
+        postParse: function (ast) {
+            var bemAST = new PugBEMAST(ast);
+
+            return bemAST.toPugAST();
         }
     }
 };
