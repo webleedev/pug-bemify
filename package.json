@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/khalidhoffman/pug-bemify.git"
+    "url": "git+https://github.com/webleedev/pug-bemify.git"
   },
   "keywords": [
     "pugjs",
@@ -21,9 +21,9 @@
   "author": "Khalid Hoffman",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/khalidhoffman/pug-bemify/issues"
+    "url": "https://github.com/webleedev/pug-bemify/issues"
   },
-  "homepage": "https://github.com/khalidhoffman/pug-bemify#readme",
+  "homepage": "https://github.com/webleedev/pug-bemify#readme",
   "devDependencies": {
     "chai": "^4.2.0",
     "mocha": "^6.1.1",
